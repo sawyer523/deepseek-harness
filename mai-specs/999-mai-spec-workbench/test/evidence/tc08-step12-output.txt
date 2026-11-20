@@ -1,0 +1,33 @@
+[session session-3c1f90e2b4764f778dbc6097771b278f | finish: completed]
+[tool call: mai_features {}]
+[tool result head: SDD features under /private/tmp/mai-tc08/mai-specs (1)
+- 010-layout [Phase: dev, Profile: standard, P1] 布局契约样例
+    artifacts: brief, prd
+    acceptance: no-test-plan]
+[tool call: mai_spec_read {"feature": "010", "artifact": "prd"}]
+[tool result head: <path>/private/tmp/mai-tc08/mai-specs/010-layout/docs/product.md</path>
+<type>file</type>
+<content>
+1	# 产品规格（自定义路径）
+2
+3	- FR-01 自定义路径下的 PRD
+4
+</content>]
+--- final response ---
+## SDD Feature 与产物状态
+
+工作区 `/private/tmp/mai-tc08/mai-specs` 下只有 1 个 Feature：
+
+| Feature | 阶段 | Profile | 优先级 | 已有产物 | 缺失产物 | 验收 |
+|---|---|---|---|---|---|---|
+| `010-layout` 布局契约样例 | dev | standard | P1 | brief, prd | design, test-plan, design-review, code-review | 无测试计划（no-test-plan） |
+
+## Feature 010 的 PRD 第一条需求
+
+PRD 实际文件位于非默认路径：[product.md](/private/tmp/mai-tc08/mai-specs/010-layout/docs/product.md)，其标题为「产品规格（自定义路径）」。
+
+第一条需求：
+
+> **FR-01** 自定义路径下的 PRD
+
+也就是说，该 Feature 的 PRD 只有这一条需求，它用来说明：规格文档可以放在自定义路径下，并且能被正确读取。

@@ -1,0 +1,43 @@
+$ node --import tsx/esm apps/cli/src/bin.ts --profile headless --patch plugins/mai-spec-workbench/cordis.yml '列出本仓库所有 SDD Feature 的编号、标题、阶段、优先级和验收状态'
+[llm-deepseek-api-key] model listing from https://api.deepseek.com/models loaded 2 model(s), skipped 0 row(s)
+dsh: reasoning:
+The user asks to list all SDD Features in this repo with number, title, phase, priority, and acceptance status. There's a tool `mai_features` for this. Let me use it.
+dsh: reasoning:
+The tool reports 1 feature. Let me also verify the mai-specs directory contents and acceptance results in TEST_PLAN maybe. The user wants acceptance status. Let me check the test-plan for acceptance counts.
+dsh: reasoning:
+Now check acceptance status in TEST_PLAN.md. The tool said "no-results". Let me read TEST_PLAN.md to find acceptance-result counts.
+dsh: reasoning:
+The TEST_PLAN status is "只规划，未执行" (planned only, not executed), acceptance results empty → no-results. Phase is draft per features tool. Priority P1.
+
+Let me also check BRIEF.md for phase field to confirm, and maybe ROADMAP "规划中". Let me quickly confirm BRIEF.
+dsh: reasoning:
+Now answer in Chinese with table. Note only 1 feature exists.
+
+Data:
+- 编号 999
+- 标题 my-ai-infra SDD 工作台只读插件
+- 阶段 draft (ROADMAP: 规划中)
+- 优先级 P1
+- 验收状态: 未执行（no-results）；TEST_PLAN 状态"只规划，未执行"，执行结果表为空
+
+Also mention artifacts present: brief, prd, design, test-plan, design-review, code-review — all six exist per tool. Wait, tool says artifacts: brief, prd, design, test-plan, design-review, code-review. But TEST_PLAN says code-review missing at writing time; now review/code_review.md exists. So all six present now.
+
+Let me present concisely. Also maybe note acceptance cases AC-01~AC-06, TC-01~TC-10 not executed.
+
+I should be careful: "验收状态" — no-results default state means TEST_PLAN exists but no result rows. Provide that.
+
+Format: a table plus brief notes.
+本仓库 `mai-specs/` 目录下只有 **1 个** SDD Feature；我已经通过 `mai_features` 工具和 ROADMAP、BRIEF、TEST_PLAN 进行了交叉核对：
+
+| 编号 | 标题 | 阶段 | 优先级 | 验收状态 |
+|---|---|---|---|---|
+| 999 | my-ai-infra SDD 工作台只读插件 | draft（在 ROADMAP 中归入“规划中”） | P1 | `no-results`：已规划 TC-01～TC-10，但尚未执行，也没有回填执行结果 |
+
+补充说明：
+
+- **Profile**：standard；负责人为 xiaonan chen。
+- **产物齐全度**：brief、prd、design、test-plan、design-review、code-review 这六类产物目前都存在。
+- **验收口径**：`TEST_PLAN.md` 中标注的状态是“只规划，未执行”，末尾的“执行结果”表仅有表头，没有数据行，因此 `mai_features` 报出 `no-results`；覆盖的验收标准为 AC-01～AC-06（来自 PRD），对应业务用例 TC-01～TC-10。
+- **阶段依据**：`ROADMAP.md` 的“规划中”表中包含 999，“进行中”和“已完成”两张表为空；`BRIEF.md` 中的 Phase 为 `draft`。
+
+来源文件：[ROADMAP.md](mai-specs/ROADMAP.md) · [BRIEF.md](mai-specs/999-mai-spec-workbench/BRIEF.md) · [TEST_PLAN.md](mai-specs/999-mai-spec-workbench/test/TEST_PLAN.md)

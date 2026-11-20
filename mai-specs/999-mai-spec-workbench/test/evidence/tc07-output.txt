@@ -1,0 +1,14 @@
+[session session-c0fcc735b9354da1a9d578791e9b48a0 | finish: completed]
+[tool calls: , ]
+--- final response ---
+当前工作区没有可列出的 SDD Feature。
+
+**原因**:工作目录 `/private/tmp/mai-tc07-empty` 是空目录,其中不存在 `mai-specs/` 工作区。SDD Feature 的清单从 `mai-specs/` 下读取,因此查询直接报错:
+
+> no mai-specs/ workspace found at "/private/tmp/mai-tc07-empty/mai-specs"; run "mai init" first
+
+**下一步可选**:
+- 若要在该目录开始 SDD 流程,先运行 `mai init` 初始化 `mai-specs/`,之后会有 Feature 可列出;
+- 若 Feature 在别的工作区,请告知路径(或切换到该目录),我再列出。
+
+需要我在这里执行 `mai init` 吗?

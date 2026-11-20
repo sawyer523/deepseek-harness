@@ -1,0 +1,38 @@
+[session session-7386388280dd4931976ac13260b22341 | finish: completed]
+[tool call: mai_features {}]
+[tool result head: SDD features under /private/tmp/mai-tc03/mai-specs (2)
+- 001-alpha [Phase: draft, Profile: simple, P2] Alpha 需求
+    artifacts: brief
+    acceptance: no-test-plan
+- 002-beta [Phase: dev, Profile: standard, P1] Beta 需求
+    artifacts: brief, test-plan
+    acceptance: no-results]
+[tool call: mai_spec_read {"feature": "002-beta", "artifact": "test-plan"}]
+[tool result head: <path>/private/tmp/mai-tc03/mai-specs/002-beta/test/TEST_PLAN.md</path>
+<type>file</type>
+<content>
+1	# 业务测试计划
+2
+3	## 执行结果
+4
+5	| 用例 / 已有测试引用 | 结果 | 实际观察与证据 | 问题或复验事项 |
+6	|---|---|---|---|
+7
+8	## 其他
+9
+</content>]
+--- final response ---
+## 工作区 SDD Feature 概览
+
+工作区路径：`/private/tmp/mai-tc03/mai-specs`，共 **2** 个 Feature。
+
+| Feature | 类型/优先级 | 阶段 | Profile | 已有产物 | 验收状态 |
+|---|---|---|---|---|---|
+| **001-alpha** — Alpha 需求 | P2 | draft | simple | brief | ⚠️ 无测试计划（尚未生成 TEST_PLAN） |
+| **002-beta** — Beta 需求 | P1 | dev | standard | brief、test-plan | ⏳ 无验收结果（已生成测试计划，`执行结果` 表为空） |
+
+### 说明
+- **001-alpha** 目前只有 brief，尚未进入测试计划编制阶段，因此没有可统计的验收用例。`mai-specs/001-alpha`。
+- **002-beta** 已生成 [TEST_PLAN.md](mai-specs/002-beta/test/TEST_PLAN.md)，但“执行结果”一节只有空表格，尚无任何用例记录或通过/失败数据，因此无法判定验收结论。
+
+总体：两个 Feature 均**未完成验收**——一个缺测试计划，一个缺执行结果。

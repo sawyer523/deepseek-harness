@@ -1,0 +1,7 @@
+$ node --import tsx/esm apps/cli/src/bin.ts --profile web --dump-config --patch plugins/mai-spec-workbench/cordis.yml
+# == @deepseek-ai/dsh-base
+- id: tool-plugin-manager
+--
+# == /Users/cxn/go/src/sawyer523/deepseek-harness/plugins/mai-spec-workbench/cordis.yml
+- id: mai-spec-workbench
+  name: file:///Users/cxn/go/src/sawyer523/deepseek-harness/plugins/mai-spec-workbench/src/index.ts

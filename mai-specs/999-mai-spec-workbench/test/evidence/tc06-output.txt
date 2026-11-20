@@ -1,0 +1,32 @@
+[session session-81d9faa1a5594182b302ea938a363f16 | finish: completed]
+[tool call: mai_spec_read {"feature": "005", "artifact": "code-review"}]
+[tool result (isError) head: Error: artifact "code-review" of "005-partial" not found; present artifacts: brief, prd]
+[tool call: mai_features {}]
+[tool result head: SDD features under /private/tmp/mai-tc06/mai-specs (1)
+- 005-partial [Phase: dev, Profile: standard, P1] 产物缺失样例
+    artifacts: brief, prd
+    acceptance: no-test-plan]
+--- final response ---
+我无法转述一份不存在的原文：工具并没有返回 code-review 的内容，它返回的是一条错误信息。按你的要求，这条工具返回的原文如下：
+
+```
+Error: artifact "code-review" of "005-partial" not found; present artifacts: brief, prd
+```
+
+补充一点从 tools 返回的结果中得到的事实：`mai_features` 也确认，Feature 005（即 `005-partial`，标题为“产物缺失样例”，Phase 为 dev，Profile 为 standard，P1）目前只有两个产物：
+
+| 产物 | 是否存在 |
+|---|---|
+| brief | ✅ 存在 |
+| prd | ✅ 存在 |
+| design | ❌ 未生成 |
+| test-plan | ❌ 未生成（acceptance: no-test-plan）|
+| design-review | ❌ 未生成 |
+| code-review | ❌ 未生成 |
+
+因此，Feature 005 的 code-review 从未生成过，所以没有可转述的原文。我不能编造，也不能用其他 Feature 的审核内容充当它。
+
+接下来，你希望我如何继续？可选方案：
+1. 改为读取并完整转述该 Feature 现有的 `prd` 或 `brief`；
+2. 你指定另一个确实已有 code-review 的 Feature，我读取并转述其原文；
+3. 若你本意就是检查“产物缺失”这类情况，那么上述错误信息本身就是预期结果，无需其他动作。

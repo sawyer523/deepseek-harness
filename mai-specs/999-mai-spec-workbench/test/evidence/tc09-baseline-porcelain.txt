@@ -1,0 +1,4 @@
+ M .gitignore
+?? .my-ai-infra.json
+?? mai-specs/
+?? plugins/

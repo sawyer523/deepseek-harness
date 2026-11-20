@@ -1,0 +1,44 @@
+$ node --import tsx/esm apps/cli/src/bin.ts --profile headless --patch plugins/mai-spec-workbench/cordis.yml '用 mai 工具先列出本仓库的 SDD Feature，然后读取 999 的 PRD，总结它的验收标准'
+[llm-deepseek-api-key] model listing from https://api.deepseek.com/models loaded 2 model(s), skipped 0 row(s)
+dsh: reasoning:
+The user asks: use mai tools to list SDD features in this repo, then read PRD for 999 and summarize its acceptance criteria.
+
+This matches the my-ai-infra skill? The task mentions "mai 工具" — the mai tooling. Let me load the my-ai-infra skill first? The task is about listing SDD features and reading PRD — that's mai_spec tooling. The skill "my-ai-infra" is about maintaining global personal assets library. Hmm, this task is about SDD features. Maybe load it anyway since "mai" tooling named. Let me first call mai_features to list.
+
+Let me do both: call mai_features, and load the skill in parallel.
+dsh: reasoning:
+The skill isn't really what's needed here; this task is SDD feature listing + PRD reading, which is mai_spec tools. Let me read the PRD for 999. Note acceptance: no-results — TEST_PLAN has no acceptance results.
+
+Let me read the prd.
+dsh: reasoning:
+Now summarize the acceptance criteria. Provide the feature list (1 feature) and the AC summary. Answer in Chinese.
+
+Note: acceptance: no-results means TEST_PLAN exists but no results filled. Worth mentioning as observation.
+
+Present the six ACs concisely with verification methods. Keep it tidy.
+## 1. 仓库 SDD Feature 列表
+
+`mai_features` 扫描 `mai-specs/` 得到 **1 个 Feature**：
+
+| ID | 标题 | Phase | Profile | 优先级 | 产物 | 验收 |
+|---|---|---|---|---|---|---|
+| 999-mai-spec-workbench | my-ai-infra SDD 工作台只读插件 | draft | standard | P1 | brief, prd, design, test-plan, design-review, code-review（六类齐全） | `no-results`（TEST_PLAN 有执行结果表但未回填结果） |
+
+## 2. 999 PRD 的验收标准总结
+
+PRD 第 9 章共 6 条 AC，覆盖三个功能需求（FR-01 列 Feature、FR-02 读规格、FR-03 setup）：
+
+| AC | 场景 | 验收要点 | 验证方式 |
+|---|---|---|---|
+| **AC-01** 列出 Feature 概览（FR-01/BR-01/BR-04） | 工作目录存在含至少一个 Feature 的 `mai-specs/` | `mai_features` 返回每个 Feature 的 id、标题、Phase、Profile、优先级、六类产物存在标记与验收摘要；`999-mai-spec-workbench` 必须在结果中，Phase 如实反映 BRIEF 当前值 | 单测（解析函数）+ headless 真实模型会话留档 |
+| **AC-02** 验收摘要缺省态（FR-01/BR-04） | 无 `TEST_PLAN.md`，或 TEST_PLAN 无 `## 执行结果` 内容 | 分别返回 `status: "no-test-plan"` 与 `status: "no-results"`，不得伪造计数 | 单测覆盖两种缺省态 + 正常计数 |
+| **AC-03** 读取规格文档（FR-02/NFR-01） | 目标 Feature 与产物存在 | 以 `feature=999`（或目录名）、`artifact=prd`、默认窗口调用 `mai_spec_read`，返回 `spec/PRD.md` 的行号窗口、路径与 totalLines，默认窗口 ≤ 2000 行 | headless 会话留档；单测覆盖窗口与超长行截断 |
+| **AC-04** 错误路径（BR-03/COPY-01~03） | 分别构造 `mai-specs/` 缺失、Feature 编号不存在、产物未生成 | 三种错误分别输出 PRD 中 COPY-01~03 的固定文案，均为 `isError` 工具结果而非静默空值 | 单测（路径解析与错误分支）+ headless 抽验一种 |
+| **AC-05** FEATURE_LAYOUT.json 契约覆盖（BR-02） | 布局文件把某产物登记到非默认路径且文件存在 | 两个工具都按契约路径判定与读取；布局文件损坏时整体报错并指明该文件（不得静默回退默认路径） | 单测（临时目录构造布局文件） |
+| **AC-06** 插件加载与可移植 setup（FR-03/BR-05） | 干净 checkout（无 `cordis.yml`） | 执行 `node plugins/mai-spec-workbench/setup.mjs` 后，`pnpm dsh --profile web --dump-config --patch …` 的配置树出现 `mai-spec-workbench` 插件行；重跑 setup 幂等；`cordis.yml` 被 gitignore 不入库 | 命令输出留档 + `git status` 确认未跟踪文件被忽略 |
+
+**验收标准的三条主线**：① 工具输出的信息完整且缺省态不伪造数据；② 错误必须可见、带稳定 code 与可执行提示；③ 读取受控（≤2000 行、超长行截断、可续读），且加载方式可移植、只读、不写入文件。
+
+**两点值得注意**：
+- 该 Feature 当前 acceptance 为 `no-results`，即 TEST_PLAN 的执行结果表尚未回填，AC-01～AC-06 还没有验收结论记录。
+- PRD 明确不输出"整体通过/未通过"结论（待确认事项中已决策），工具只报计数与缺省态，该判断留给人和编排者。

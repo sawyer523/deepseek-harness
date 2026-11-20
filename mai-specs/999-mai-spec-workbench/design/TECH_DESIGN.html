@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="zh-CN" data-generated-by="my-render-design-html">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="referrer" content="no-referrer">
+  <title>SDD 工作台只读插件 · 技术方案</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;icon_names=account_tree,code,folder,route,schema,task_alt&amp;display=block">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.11.1/styles/github.min.css" media="(prefers-color-scheme: light)">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.11.1/styles/github-dark.min.css" media="(prefers-color-scheme: dark)">
+  <script defer src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.11.1/highlight.min.js"></script>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --system-accent: #315db6;
+      --accent: var(--project-accent, var(--system-accent));
+      --page: #f7f8fa;
+      --panel: #fff;
+      --soft: #eff1f5;
+      --ink: #172132;
+      --muted: #515d6d;
+      --line: #d9dee7;
+      font-family: system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--page);
+      color: var(--ink);
+    }
+    @supports (color: AccentColor) {
+      :root { --system-accent: AccentColor; }
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --page: #12161e;
+        --panel: #1a202b;
+        --soft: #222a38;
+        --ink: #edf0f5;
+        --muted: #b1bdd0;
+        --line: #384353;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      max-width: 76rem;
+      margin: 0 auto;
+      padding: 0 clamp(1rem, 4vw, 3.5rem);
+      line-height: 1.7;
+      accent-color: var(--accent);
+    }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    a { color: inherit; text-decoration-color: var(--accent); text-underline-offset: .25em; }
+    p, ul { margin: .6rem 0 0; }
+    h1, h2, h3 { margin: 0; line-height: 1.25; }
+    h1 { font-size: clamp(2.35rem, 4.4vw, 3.75rem); letter-spacing: -.045em; text-wrap: balance; }
+    h2 { font-size: clamp(1.45rem, 3vw, 2rem); }
+    h3 { font-size: 1.12rem; }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+      gap: clamp(1.25rem, 4vw, 3rem);
+      align-items: center;
+      padding-block: clamp(2.5rem, 8vw, 6rem) clamp(1.75rem, 5vw, 3.5rem);
+      border-top: 4px solid var(--accent);
+    }
+    .eyebrow { margin: 0 0 .8rem; color: var(--muted); font-size: .85rem; font-weight: 650; }
+    .lead { max-width: 32em; margin-top: 1rem; color: var(--muted); font-size: 1.1rem; }
+    .hero-graphic, .diagram, .table-scroll {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 1rem;
+      background: var(--panel);
+    }
+    .hero-graphic { margin: 0; padding: clamp(.6rem, 1.6vw, 1.15rem); }
+    .hero-graphic svg { display: block; width: 100%; height: auto; color: var(--ink); }
+    .hero-graphic .track { fill: none; stroke: var(--line); }
+    .hero-graphic .route { fill: none; stroke: var(--accent); stroke-width: 2.5; }
+    .hero-graphic .arrow { fill: var(--accent); }
+    .hero-graphic .node { fill: var(--panel); stroke: var(--line); stroke-width: 1.5; }
+    .hero-graphic .node-primary { fill: var(--soft); stroke: var(--accent); stroke-width: 2; }
+    .hero-graphic .node-kind { fill: var(--muted); font-size: 15px; }
+    .hero-graphic .node-label { fill: currentColor; font-size: 19px; font-weight: 650; }
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem 1.25rem;
+      padding-block: .8rem;
+      border-block: 1px solid var(--line);
+      font-size: .92rem;
+    }
+    main { padding-bottom: 4rem; }
+    section { padding-block: clamp(1.55rem, 4vw, 2.75rem); border-bottom: 1px solid var(--line); }
+    section > p, section > ul { max-width: 58em; }
+    section > h3 { margin-top: 1.4rem; }
+    figure { margin: 1rem 0 0; }
+    .diagram, .table-scroll { padding: clamp(.75rem, 2vw, 1.25rem); }
+    .diagram-output, .table-scroll, pre { overflow-x: auto; }
+    .diagram-output > svg {
+      display: block;
+      width: clamp(calc(var(--diagram-width) * .85), 100%, var(--diagram-width));
+      max-width: none !important;
+      height: auto;
+      margin-inline: auto;
+    }
+    figcaption, summary { color: var(--muted); font-size: .9rem; }
+    .diagram-output:not([hidden]) + figcaption { margin-top: .8rem; }
+    summary { cursor: pointer; margin-top: .45rem; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th, td { padding: .5rem .7rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+    pre, code { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; }
+    pre {
+      margin: .7rem 0 0;
+      padding: .9rem 1rem;
+      border: 1px solid var(--line);
+      border-radius: .65rem;
+      background: var(--soft);
+      font-size: .88rem;
+      line-height: 1.6;
+      tab-size: 2;
+    }
+    pre > code.hljs { padding: 0; background: transparent; }
+    :not(pre) > code { overflow-wrap: anywhere; }
+    .material-symbols-outlined { display: none; }
+    .symbols-ready .material-symbols-outlined {
+      display: inline-block;
+      margin-inline-end: .4rem;
+      vertical-align: -.12em;
+      color: var(--muted);
+      font: normal 1.25rem/1 "Material Symbols Outlined";
+      font-feature-settings: "liga";
+      white-space: nowrap;
+    }
+    @media (max-width: 46rem) {
+      .hero { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">技术方案 · 开发者审阅</p>
+      <h1>SDD 工作台只读插件</h1>
+      <p class="lead">为 DeepSeek Harness 提供两个只读模型工具，把 my-ai-infra 的 mai-specs/ 工作区结构直接暴露给会话中的模型：一次调用完成 Feature 导航与验收摘要，一次调用按语义入口读取规格文档。</p>
+    </div>
+    <figure class="hero-graphic">
+      <svg viewBox="0 0 530 230" role="img" aria-labelledby="hero-title hero-desc">
+        <title id="hero-title">插件在会话与 SDD 工作区之间架起结构化只读入口</title>
+        <desc id="hero-desc">模型在 DSH 会话中经插件的两个工具读到 mai-specs 工作区的 Feature 概览、产物状态与验收摘要</desc>
+        <defs>
+          <marker id="hero-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+            <path class="arrow" d="M0 0 L8 4 L0 8 Z"></path>
+          </marker>
+        </defs>
+        <path class="track" d="M18 43H512 M18 187H512 M265 16V214" stroke-dasharray="4 5"></path>
+        <path class="route" d="M145 116H186" marker-end="url(#hero-arrow)"></path>
+        <path class="route" d="M342 116H382" marker-end="url(#hero-arrow)"></path>
+        <rect class="node" x="14" y="81" width="130" height="70" rx="10"></rect>
+        <rect class="node-primary" x="187" y="60" width="155" height="112" rx="12"></rect>
+        <rect class="node" x="384" y="81" width="132" height="70" rx="10"></rect>
+        <g text-anchor="middle">
+          <text class="node-kind" x="79" y="105">DSH 会话</text>
+          <text class="node-label" x="79" y="131">模型 · cwd</text>
+          <text class="node-kind" x="265" y="92">插件</text>
+          <text class="node-label" x="265" y="118">mai_features</text>
+          <text class="node-label" x="265" y="146">mai_spec_read</text>
+          <text class="node-kind" x="450" y="105">SDD 工作区</text>
+          <text class="node-label" x="450" y="131">mai-specs/</text>
+        </g>
+      </svg>
+      <figcaption>会话与 SDD 工作区之间只经插件两个工具，全部读取走 ctx.fs provider</figcaption>
+    </figure>
+  </header>
+  <nav aria-label="页内目录">
+    <a href="#principles">设计原则</a>
+    <a href="#architecture">整体架构</a>
+    <a href="#data">数据结构与解析</a>
+    <a href="#flow">数据流程</a>
+    <a href="#files">变更文件与核心代码</a>
+    <a href="#summary">方案小结</a>
+  </nav>
+  <main>
+    <section id="principles">
+      <h2><span class="material-symbols-outlined" aria-hidden="true">route</span>设计原则</h2>
+      <ul>
+        <li><strong>最小侵入</strong>：全部新增在仓库根 <code>plugins/mai-spec-workbench/</code>，不入 pnpm workspace、不改 <code>packages/</code>；既有代码零修改（仅 <code>.gitignore</code> 追加一行忽略本机生成的 overlay）。</li>
+        <li><strong>复用执行世界</strong>：文件访问一律经 <code>ctx.fs</code>（本地/沙箱/SSH provider 一致），会话目录用 <code>ctx.workingDirectory.ensure(exec.agent)</code>，取消透传 <code>exec.signal</code>。</li>
+        <li><strong>只读</strong>：两个工具只调用 resolve / stat / listDir / readText，不写不删。</li>
+        <li><strong>配置失败要响</strong>：项目级 <code>FEATURE_LAYOUT.json</code> 存在但损坏时整体报错指明文件，绝不静默回退默认路径。</li>
+        <li><strong>单点宽容</strong>：单个 Feature 的 BRIEF 解析失败不中断列表，以 <code>phase: "unknown"</code> 与警告如实呈现；验收摘要只报计数与缺省态，不伪造整体通过结论。</li>
+      </ul>
+    </section>
+    <section id="architecture">
+      <h2><span class="material-symbols-outlined" aria-hidden="true">account_tree</span>整体架构</h2>
+      <p>插件经 <code>setup.mjs</code> 生成的 overlay（绝对路径行）由 <code>dsh --patch</code> 插入组合树；工具注册即 effect，随插件卸载自动反注册。</p>
+      <figure class="diagram" data-diagram>
+        <div class="diagram-output" tabindex="0" hidden></div>
+        <figcaption>插件内部两个工具共享纯解析与产物契约模块，外部只依赖 dsh-base 提供的三个服务</figcaption>
+        <details>
+          <summary>查看图源</summary>
+          <pre data-mermaid>flowchart LR
+    accTitle: 整体架构与依赖
+    U[DSH 会话模型] -- 注册 --> T[ctx.tools 注册表]
+    subgraph plugin[plugins/mai-spec-workbench]
+        TF[tool-features&lt;br/&gt;mai_features]
+        TR[tool-spec-read&lt;br/&gt;mai_spec_read]
+        ML[mai-layout&lt;br/&gt;产物路径契约]
+        PS[parse-specs&lt;br/&gt;BRIEF / 结果表 / 窗口]
+    end
+    T --- TF
+    T --- TR
+    TF --> ML
+    TF --> PS
+    TR --> ML
+    TR --> PS
+    TF -- resolve / stat / listDir / readText --> FS[ctx.fs + ctx.workingDirectory]
+    TR -- resolve / stat / readText --> FS
+    FS --> WD[(mai-specs/ 工作区)]</pre>
+        </details>
+      </figure>
+    </section>
+    <section id="data">
+      <h2><span class="material-symbols-outlined" aria-hidden="true">schema</span>数据结构与解析</h2>
+      <p>无数据库；核心是三组纯函数产出的内存结构（与工具 canonical 输出同形）：</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>结构 / 函数</th><th>来源</th><th>关键规则</th></tr></thead>
+          <tbody>
+            <tr><td><code>FeatureBrief</code></td><td>BRIEF.md：标题行 <code># {id}: {title}</code> + 两列表格</td><td>仅取 <code>Phase</code> / <code>Profile</code> / <code>优先级</code> 三个键；字段缺失保持 undefined，不抛错</td></tr>
+            <tr><td><code>AcceptanceSummary</code></td><td>TEST_PLAN.md 的 <code>## 执行结果</code> 节表格</td><td>按「结果」列计数 通过/失败/未执行/受阻/待核验，未知值并入「其他」；节缺失或无数据行 → <code>no-results</code>；无 TEST_PLAN → <code>no-test-plan</code></td></tr>
+            <tr><td><code>SpecWindow</code></td><td><code>windowLines(text, offset, limit)</code></td><td>1-based 行号窗口；单次最多 2000 行、单行超 2000 字符截断加省略标记；offset 越界返回空窗口但 totalLines 如实</td></tr>
+            <tr><td><code>artifactPaths(layout)</code></td><td>内置默认映射 + <code>FEATURE_LAYOUT.json</code> 覆盖</td><td><code>version !== 1</code>、JSON 损坏或 artifacts 缺失 → 整体报错；契约未登记的产物沿用默认路径；<code>brief</code> 恒为 BRIEF.md</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Feature 目录判定：<code>/^\d{3}-/</code>（NNN-slug），列表按目录名升序；读取时目录名全等或纯三位编号前缀匹配（编号全局唯一）。</p>
+    </section>
+    <section id="flow">
+      <h2><span class="material-symbols-outlined" aria-hidden="true">route</span>数据流程</h2>
+      <h3>mai_features：概览与失败路径</h3>
+      <figure class="diagram" data-diagram>
+        <div class="diagram-output" tabindex="0" hidden></div>
+        <figcaption>两条全局失败路径（工作区缺失、布局损坏）立即报错；单 Feature 解析失败宽容降级</figcaption>
+        <details>
+          <summary>查看图源</summary>
+          <pre data-mermaid>flowchart TB
+    accTitle: mai_features 数据流程
+    A[cwd = workingDirectory.ensure] --> B{mai-specs/ 存在?}
+    B -- 不存在 --> E1[MAI_SPECS_NOT_FOUND&lt;br/&gt;提示先运行 mai init]
+    B -- 存在 --> C{FEATURE_LAYOUT.json}
+    C -- 损坏 / version 不符 --> E2[MAI_LAYOUT_INVALID 整体失败]
+    C -- 缺失或有效 --> D[扫描 NNN-slug 目录]
+    D --> F{BRIEF 可解析?}
+    F -- 缺失 / 字段异常 --> G[phase = unknown + warning]
+    F -- 正常 --> H[Phase / Profile / 优先级]
+    G --> I[stat 六类产物]
+    H --> I
+    I --> J{TEST_PLAN 存在?}
+    J -- 不存在 --> K[no-test-plan]
+    J -- 执行结果表有数据行 --> L[五态计数 + 其他]
+    J -- 节无数据行 --> M[no-results]
+    K --> N[汇总 canonical JSON]
+    L --> N
+    M --> N</pre>
+        </details>
+      </figure>
+      <h3>mai_spec_read：按语义入口读规格</h3>
+      <figure class="diagram" data-diagram>
+        <div class="diagram-output" tabindex="0" hidden></div>
+        <figcaption>每步失败都带回可执行的下一步信息（候选列表 / 已有产物）</figcaption>
+        <details>
+          <summary>查看图源</summary>
+          <pre data-mermaid>flowchart TB
+    accTitle: mai_spec_read 数据流程
+    A[feature / artifact / offset? / limit?] --> B{参数约束}
+    B -- 不满足 --> X1[ToolArgsError]
+    B --> C{目录匹配唯一?}
+    C -- 无匹配 --> X2[MAI_FEATURE_NOT_FOUND&lt;br/&gt;列出候选]
+    C -- 唯一 --> D{产物文件存在?}
+    D -- 缺失 --> X3[MAI_ARTIFACT_NOT_FOUND&lt;br/&gt;列出已有产物]
+    D -- 存在 --> E[readText + 行窗口化]
+    E --> F[path / offset / lines / totalLines]</pre>
+        </details>
+      </figure>
+    </section>
+    <section id="files">
+      <h2><span class="material-symbols-outlined" aria-hidden="true">folder</span>变更文件与核心代码</h2>
+      <pre tabindex="0"><code class="language-diff">+ plugins/mai-spec-workbench/          # 全部为新增
++   setup.mjs                          # 生成本机绝对路径 cordis.yml（幂等）
++   cordis.yml                         # setup 产物，.gitignore 忽略，不入库
++   src/index.ts                       # 插件入口：name/inject/apply，注册两工具
++   src/errors.ts                      # MaiWorkbenchError + 稳定错误码
++   src/mai-layout.ts                  # 产物路径契约（默认 + FEATURE_LAYOUT.json）
++   src/parse-specs.ts                 # 纯解析：BRIEF / 结果表 / 行窗口
++   src/tool-features.ts               # mai_features 工具
++   src/tool-spec-read.ts              # mai_spec_read 工具
++   tests/parse.test.ts                # node:test 纯函数单测
++   README.md                          # 安装 / 配置 / 启动 / 验证
+! .gitignore                           # 追加忽略 plugins/mai-spec-workbench/cordis.yml</code></pre>
+      <h3>错误模型（src/errors.ts，拟议代码）</h3>
+      <pre tabindex="0"><code class="language-typescript">export const MAI_ERROR_CODES = {
+  notFound: 'MAI_SPECS_NOT_FOUND',            // mai-specs/ 缺失，提示先 mai init
+  featureNotFound: 'MAI_FEATURE_NOT_FOUND',   // 编号/目录名无匹配，附候选列表
+  artifactNotFound: 'MAI_ARTIFACT_NOT_FOUND', // 产物未生成，附已有产物
+  layoutInvalid: 'MAI_LAYOUT_INVALID',        // FEATURE_LAYOUT.json 损坏，指明文件
+} as const
+
+export class MaiWorkbenchError extends HarnessError {
+  constructor(code: MaiErrorCode, message: string) { super(message, code) }
+}</code></pre>
+      <h3>工具骨架（src/index.ts，拟议代码）</h3>
+      <pre tabindex="0"><code class="language-typescript">export const name = 'mai-spec-workbench'
+export const inject = ['tools', 'fs', 'workingDirectory']  // dsh-base 提供三个服务
+
+export function apply(ctx: Context): void {
+  ctx.tools.register(defineTool({
+    name: 'mai_features',
+    parameters: {},                       // 无参数
+    async execute(_args, exec) {
+      const cwd = await ctx.workingDirectory.ensure(exec.agent, exec.signal)
+      const root = await ctx.fs.resolve('mai-specs', { cwd, signal: exec.signal })
+      if (await ctx.fs.stat(root, exec.signal) === undefined)
+        throw new MaiWorkbenchError('notFound', `no mai-specs/ directory under "${cwd}"; run "mai init" first`)
+      const layout = await readLayoutIfPresent(ctx, root, exec.signal)  // 损坏即抛
+      // 扫描 NNN-slug 目录 → BRIEF/产物/验收摘要 → canonical JSON（单 Feature 宽容）
+    },
+  }))
+  ctx.tools.register(defineTool({
+    name: 'mai_spec_read',
+    parameters: {
+      feature: { type: 'string', required: true },   // "999" 或 "999-mai-spec-workbench"
+      artifact: { type: 'string', required: true, enum: ['brief', 'prd', 'design', 'test-plan', 'design-review', 'code-review'] },
+      offset: { type: 'number' },                    // 默认 1
+      limit: { type: 'number' },                     // 默认/上限 2000
+    },
+    // 目录唯一匹配 → 契约路径 stat → readText → 行窗口 canonical 输出
+  }))
+}</code></pre>
+      <h3>验收计数口径（src/parse-specs.ts，拟议代码）</h3>
+      <pre tabindex="0"><code class="language-typescript">// 定位 TEST_PLAN.md 的「## 执行结果」节，取节内第一个表格，
+// 按表头「结果」列精确匹配计数；未匹配的非空值并入 '其他' 并回传原始值供警告。
+const KNOWN_RESULTS = ['通过', '失败', '未执行', '受阻', '待核验'] as const
+
+export function parseAcceptanceResults(text: string): {
+  summary: { status: 'counted'; counts: Record&lt;string, number&gt; } | { status: 'no-results' }
+  unknownValues: string[]
+}</code></pre>
+    </section>
+    <section id="summary">
+      <h2><span class="material-symbols-outlined" aria-hidden="true">task_alt</span>方案小结</h2>
+      <p>本次交付一个零侵入的 out-of-tree 只读插件：两个模型工具把 mai-specs/ 的结构化事实（Feature 阶段、产物状态、验收计数）一次调用暴露给会话，替代此前的多跳通用文件工具翻找。最关键的取舍是解析与产物契约全部做成不依赖框架的纯函数（可直接单测），以及"布局损坏即失败、单 Feature 异常即降级"的失败语义——汇总工具不伪造证据，缺什么就如实报什么。</p>
+    </section>
+  </main>
+  <script type="module">
+    window.hljs?.highlightAll();
+    document.fonts.load('20px "Material Symbols Outlined"').then(fonts => {
+      if (fonts.length) document.documentElement.classList.add('symbols-ready');
+    }).catch(() => {});
+
+    const diagrams = [...document.querySelectorAll('[data-diagram]')];
+    if (diagrams.length) {
+      try {
+        const { default: mermaid } = await import('https://cdn.jsdelivr.net/npm/mermaid@11.16.0/dist/mermaid.esm.min.mjs');
+        const colorScheme = matchMedia('(prefers-color-scheme: dark)');
+        let pending = Promise.resolve();
+        let renderedTheme;
+
+        async function renderDiagrams() {
+          const theme = colorScheme.matches ? 'dark' : 'neutral';
+          if (theme === renderedTheme) return;
+          mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'strict',
+            suppressErrorRendering: true,
+            htmlLabels: false,
+            theme,
+            fontFamily: getComputedStyle(document.body).fontFamily
+          });
+          for (const [index, figure] of diagrams.entries()) {
+            const output = figure.querySelector('.diagram-output');
+            const source = figure.querySelector('[data-mermaid]');
+            try {
+              const { svg } = await mermaid.render(`review-${theme}-${index + 1}`, source.textContent.trim());
+              output.innerHTML = svg;
+              const drawing = output.querySelector('svg');
+              drawing.style.setProperty('--diagram-width', `${drawing.viewBox.baseVal.width}px`);
+              output.hidden = false;
+              source.closest('details').hidden = true;
+            } catch (error) {
+              output.hidden = true;
+              source.closest('details').hidden = false;
+              console.warn('图表未能绘制', error);
+            }
+          }
+          renderedTheme = theme;
+        }
+
+        function scheduleRender() {
+          pending = pending.then(renderDiagrams);
+        }
+
+        colorScheme.addEventListener('change', scheduleRender);
+        scheduleRender();
+      } catch (error) {
+        console.warn('图表组件未能加载', error);
+      }
+    }
+  </script>
+</body>
+</html>

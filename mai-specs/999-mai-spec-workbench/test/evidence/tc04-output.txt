@@ -1,0 +1,22 @@
+$ node --import tsx/esm apps/cli/src/bin.ts --profile headless --patch plugins/mai-spec-workbench/cordis.yml '读取 Feature 999 的 PRD，列出它定义的全部验收标准编号和标题'
+[llm-deepseek-api-key] model listing from https://api.deepseek.com/models loaded 2 model(s), skipped 0 row(s)
+dsh: reasoning:
+We need to read the PRD for feature 999 using the mai_spec_read tool.
+dsh: reasoning:
+The user asks: 读取 Feature 999 的 PRD，列出它定义的全部验收标准编号和标题.
+
+So list AC-01 through AC-06 with titles.
+Feature 999（`999-mai-spec-workbench`）的 PRD 第 9 节共定义了 6 条验收标准：
+
+| 编号 | 标题 | 关联需求 |
+|---|---|---|
+| AC-01 | 列出 Feature 概览 | FR-01、BR-01、BR-04 |
+| AC-02 | 验收摘要的缺省态 | FR-01、BR-04 |
+| AC-03 | 读取规格文档 | FR-02、NFR-01 |
+| AC-04 | 错误路径 | BR-03、COPY-01～03 |
+| AC-05 | FEATURE_LAYOUT.json 契约覆盖 | BR-02 |
+| AC-06 | 插件加载与可移植 setup | FR-03、BR-05 |
+
+来源：[PRD.md 第 9 节验收标准](mai-specs/999-mai-spec-workbench/spec/PRD.md)（第 105–159 行）。
+
+补充说明：该 PRD 的 TEST_PLAN 当前执行结果为 `no-results`，即上述 6 条尚未回填验收结果。

@@ -1,0 +1,39 @@
+$ node --import tsx/esm apps/cli/src/bin.ts --profile headless --patch plugins/mai-spec-workbench/cordis.yml '读取 Feature 123 的 PRD'
+[llm-deepseek-api-key] model listing from https://api.deepseek.com/models loaded 2 model(s), skipped 0 row(s)
+dsh: reasoning:
+The user asks to read Feature 123's PRD. This matches the my-ai-infra skill? The skill catalog mentions mai_features and mai_spec_read tools. Feature 123 is an SDD feature. There's a tool `mai_features` and `mai_spec_read`. The skill my-ai-infra is about maintaining personal asset libraries. Reading a PRD... The instructions say load skill if task clearly matches skill description. "读取 Feature 123 的 PRD" — there's my-create-prd skill for writing/maintaining PRD, but reading is just reading. The mai_spec_read tool directly reads artifacts. I think simplest: call mai_features to list, then mai_spec_read with artifact "prd".
+
+Let me do that. Maybe just mai_spec_read feature "123" artifact "prd" directly. But first verify feature exists. I'll call both in parallel? mai_spec_read may fail if not exists. Let's call mai_features first... Actually parallel is fine, both independent—reading directly.
+
+Let me call mai_spec_read and mai_features together.
+dsh: reasoning:
+Feature 123 doesn't exist. Maybe the mai-specs dir only has 999. Let me check the directory to be sure, maybe there are feature dirs not registered.
+dsh: reasoning:
+Feature 123 doesn't exist. The only feature is 999. Maybe user meant a different number, or the PRD might be somewhere else in the repo (e.g., docs mentioning feature 123?). Let me quickly search for "123" in mai-specs or maybe a feature in another location. Could "Feature 123" be a generic placeholder? The workspace has only 999. I should report back and ask whether they meant 999, or point out it doesn't exist. But maybe I should check if there's another mai-specs root outside workspace? Probably not.
+
+Let me do a quick grep for "123" in mai-specs.
+dsh: reasoning:
+So "读取 Feature 123 的 PRD" is the test case from TEST_PLAN TC-03 (a negative case). The user likely is exercising that test. My response should be the tool result error. I should report accurately: Feature 123 does not exist; available: 999-mai-spec-workbench. Maybe also offer to read 999's PRD.
+
+Should I read 999's PRD? The user asked for 123 specifically. Best: report not found with candidates, and offer/ask if they meant 999. Maybe proactively read 999 PRD? Not asked. Keep short but helpful.
+
+I'll note it matches negative path TC-03 of 999's test plan.
+
+Actually, is it appropriate to give final answer? Yes—single-step task complete (attempted read, feature absent).
+
+Provide the exact error message and candidates, plus mention if they meant 999.
+Feature 123 不存在。`mai_spec_read` 返回：
+
+```
+Error: feature "123" not found; available: 999-mai-spec-workbench
+```
+
+我核对了一下工作区 `mai-specs/`，当前只登记了一个 Feature：
+
+| 编号 | 标题 | 阶段 | 优先级 |
+|---|---|---|---|
+| 999 | [my-ai-infra SDD 工作台只读插件](mai-specs/999-mai-spec-workbench/BRIEF.md) | draft | P1 |
+
+另外，`mai-specs/999-mai-spec-workbench/test/TEST_PLAN.md` 的 TC-03 正是用「读取 Feature 123 的 PRD」作为「Feature 编号不存在」的负向用例，预期就是上面这条带候选列表的错误结果——所以这次失败符合设计预期，不是静默空值。
+
+如果你其实想读的是 999，告诉我一声我就把它的 PRD 读出来；或者你先用 `my-create-feature` 新建编号 123 的需求，再让我读。

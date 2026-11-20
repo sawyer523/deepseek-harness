@@ -1,0 +1,32 @@
+{
+  // Plugin-local typecheck project. Mirrors a workspace package's project
+  // references (vendor and dsh dependencies compile under their own tsconfig
+  // boundaries, so their declarations — not sources — join this program).
+  // Not referenced by the root solution, so `pnpm run typecheck` and repo
+  // gates ignore it. tsx resolves runtime imports through the repository
+  // base `paths` (this file's extends) at source-launch time.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "incremental": false,
+    "noEmit": true,
+    "rewriteRelativeImportExtensions": false
+  },
+  "include": [
+    "src",
+    "tests"
+  ],
+  "references": [
+    { "path": "../../packages/util/error" },
+    { "path": "../../packages/util/values" },
+    { "path": "../../packages/core/tools" },
+    { "path": "../../packages/fs/fs" },
+    { "path": "../../packages/session/working-directory" },
+    { "path": "../../packages/sdk/client" },
+    { "path": "../../vendor/cosmokit" },
+    { "path": "../../vendor/cordis" },
+    { "path": "../../vendor/schemastery" }
+  ]
+}
